@@ -12,6 +12,7 @@
          */
         typeGuessing: true,
 
+
         /**
          * encode an object
          */
@@ -25,6 +26,9 @@
                 val = obj[key];
                 if (typeof val == 'object') {
                     val = '~' + myLEON.encode(obj[key]) + '~';
+                    if (val === '~~') {
+                        val = '~-0~';
+                    }
                 } else {
                     val = myLEON.encodeVal(val);
                 }
@@ -43,11 +47,10 @@
          * escape a string
          */
         esc: function(val) {
-            // val = val.replace(/\-/, '--');
-            val = val.replace(/\-([^0-9])/g, '--$1'); // replace - with --, if there is no number following
-            val = val.replace(/\_/, '-_');
-            val = val.replace(/\./, '-.');
-            val = val.replace(/\~/, '-~');
+            val = val.replace(/\-([^1-9])/g, '--$1'); // replace - with --, if there is no number following
+            val = val.replace(/\_/g, '-_');
+            val = val.replace(/\./g, '-.');
+            val = val.replace(/\~/g, '-~');
             return val;
         },
 
@@ -56,10 +59,12 @@
          * unescape a string
          */
         unEsc: function(val) {
-            val = val.replace(/\-\-/, '-');
-            val = val.replace(/\-\_/, '_');
-            val = val.replace(/\-\./, '.');
-            val = val.replace(/\-\~/, '~');
+            val = val.replace(/\-\-0/g, '---00');
+            val = val.replace(/\-0/g, '');
+            val = val.replace(/\-\-/g, '-');
+            val = val.replace(/\-\_/g, '_');
+            val = val.replace(/\-\./g, '.');
+            val = val.replace(/\-\~/g, '~');
             return val;
         },
 
@@ -80,9 +85,18 @@
             return '';
         },
 
+
+        /**
+         * guess the value's type
+         * @param val the value as string
+         * @return a typeGuessed val
+         */
         guessValueType: function(val) {
             if (myLEON.typeGuessing === false || typeof val !== 'string') {
                 return val;
+            }
+            if (val === '') {
+                return [];
             }
             if (/^[-+]?\d+(e[0-9]+)?$/.test(val)) {
                 return parseInt(val);
@@ -105,6 +119,9 @@
             return val;
         },
 
+        /**
+         * decode a LEON string
+         */
         decode: function(str) {
             var expressions = undefined;
             var exprKey, exprVal,exprIndex = 0,levelDir = 1,underScore = -1;
@@ -116,6 +133,7 @@
             }
             str += '.';
             for (i = 0; i < str.length; i++) {
+                
                 if (str[i] === '-') {
                     if (i === str.length-1 || "0123456789~-_.".indexOf(str[i+1]) < 0) {
                         myLEON.error = 'parse error: unexpected - at ' + i;
@@ -125,6 +143,10 @@
                     continue;
                 }
                 if (str[i] === '_' && level === 0) {
+                    if (underScore !== -1) {
+                        myLEON.error = 'parse error: unexpected _ at ' + i;
+                        return undefined;
+                    }
                     underScore = i;
                     continue;
                 }
@@ -173,12 +195,11 @@
                     exprIndex++;
                     underScore = -1;
                     if (exprVal[0] === '~') {
-                        expressions[exprKey] = myLEON.decode(exprVal.slice(1, exprVal.length - 1)); // ~1.2.3~
+                        expressions[exprKey] = myLEON.decode(exprVal.slice(1, exprVal.lastIndexOf('~')));
                         if (expressions[exprKey] === 'undefined') {
                             LEON.error = 'Error in sub expression ' + exprVal + ':\n' + LEON.error;
                             return undefined;
                         }
-
                     } else {
                         expressions[exprKey] = myLEON.guessValueType(myLEON.unEsc(exprVal));
                     }
@@ -197,8 +218,12 @@
     };
 
     if (window.LEON === undefined) {
-        window.LEON = { encode: myLEON.encode, decode: myLEON.decode, error: myLEON.error, typeGuessing: myLEON.typeGuessing };
-    }
-    
+        window.LEON = { 
+            encode: myLEON.encode, 
+            decode: myLEON.decode, 
+            error: function() { return myLEON.error }, 
+            typeGuessing: function(b) { myLEON.typeGuessing = b }
+        };
+    }    
 
 }());
