@@ -16,13 +16,14 @@ url-encoding them into something like `%HH`.
   and the outer brackets are omitted
 - commas are represented as a point (`,` changes to `.`)
 - underscores are to identify a key-value-pair (`key:val` changes to `key_val`)
-- There are no quote signs to identify a string. As a result of this, value types are guessed by the decode method. You can turn off typeGuessing and force Strings by setting `LEON.typeGuessing = false;`
-    - `true`, `false` is recognized as a `boolean`, 
-    - `null` as `null`
-    - `undefined` as `undefined`, 
-    - `NaN` as `NaN`, 
-    - Numbers as Ints/Floats
-    - Everything else is returned as a string
+- There are no quote signs to identify a string. As a result of this, value types are guessed by the decode method. You can turn off typeGuessing and force Strings by setting `LEON.typeGuessing(false);`
+    - empty strings are guessed to be empty arrays
+    - `true`, `false` is guessed to be a `boolean`, 
+    - `null` is guessed to be `null`
+    - `undefined` is guessed to be `undefined`, 
+    - `NaN` is guessed to `NaN`, 
+    - numeric strings are guessed to be Ints/Floats
+    - everything else is returned as a string
 
 ### String escaping rules
 
@@ -33,6 +34,7 @@ String escaping is done using hyphens.
 - tildes are escaped to "-~"
 - hyphens are escaped to double hyphens
 - negative integer numbers stay as they are (so -x becomes --x, but -9 stays -9)
+- `-0` is escaped to emptiness. So `abc-0` becomes `abc`. This helps the parser to identify empty objects: `~-0~`. If you want to name something `-0`, then you escape it with a hyphen: `--0`
 
 ### Examples
 
@@ -56,6 +58,7 @@ String escaping is done using hyphens.
 - It has some limitations: 
     - LEON does not have a syntax definition for 1-length arrays (yet). So LEON.decode(LEON.encode([666])) returns 666. 
     - when encoding a string like "666", the LEON decoder returns it as a number. You can turn off typeGuessing if you want to force strings.
+    - empty strings are returned as empty arrays []
 
 
 ## License
