@@ -42,7 +42,7 @@ String escaping is done using hyphens.
 - **LEON:** `1.2.3.4`
 
 - **JSON:** `[{x:1,y:[1,2,3],z:{"border-style":"1px solid green"},a:[1,2,3]},23]`
-- **LEON:** `~x_1.y_~1.2.3~.z_~border-_style_1 px solid~.a_~1.2.3~~.23`
+- **LEON:** `~x_1.y_~1.2.3~.z_~border-_style_1 px solid green~.a_~1.2.3~~.23`
 
 ### Usage
 
