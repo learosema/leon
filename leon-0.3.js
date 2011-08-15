@@ -20,15 +20,19 @@
             if (typeof obj != 'object') {
                 return myLEON.encodeVal(obj);
             }
-            var key, val, i = 0;
+            var key, val, i = 0, subObject;
             var outputArray = [];
             for (key in obj) {
                 val = obj[key];
                 if (typeof val == 'object') {
-                    val = '~' + myLEON.encode(obj[key]) + '~';
-                    if (val === '~~') {
-                        val = '~-0~';
+                    subObject = myLEON.encode(obj[key]);
+                    val = '~' + subObject;
+                    if ((subObject.length === 0) || 
+                        (subObject.length > 0 && 
+                        subObject[subObject.length - 1] === '_')) {
+                        val += '-0';
                     }
+                    val += '~';
                 } else {
                     val = myLEON.encodeVal(val);
                 }
