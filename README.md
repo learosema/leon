@@ -53,6 +53,7 @@ String escaping is done using hyphens.
 
 ### Why is LEON so evil ?
 
+- it's untested and created just for fun, in order to get started with the basics of git and github.
 - LEON is less human readable than JSON
 - LEON sounds nicer than just LON :)
 - It has some limitations: 
