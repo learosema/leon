@@ -1,6 +1,6 @@
-(function() {
+var LEON = (function() {
 
-    var myLEON = {
+    var _ = {
         /**
          * LEON's error string
          */
@@ -18,14 +18,14 @@
          */
         encode: function(obj) {
             if (typeof obj != 'object') {
-                return myLEON.encodeVal(obj);
+                return _.encodeVal(obj);
             }
             var key, val, i = 0, subObject;
             var outputArray = [];
             for (key in obj) {
                 val = obj[key];
                 if (typeof val == 'object') {
-                    subObject = myLEON.encode(obj[key]);
+                    subObject = _.encode(obj[key]);
                     val = '~' + subObject;
                     if ((subObject.length === 0) || 
                         (subObject.length > 0 && 
@@ -34,12 +34,12 @@
                     }
                     val += '~';
                 } else {
-                    val = myLEON.encodeVal(val);
+                    val = _.encodeVal(val);
                 }
                 if (key == i) {
                     outputArray.push(val);
                 } else {
-                    outputArray.push(myLEON.esc(key) + '_' + val);
+                    outputArray.push(_.esc(key) + '_' + val);
                 }
                 i++;
             }
@@ -78,13 +78,13 @@
          */
         encodeVal: function(val) {
             if (typeof val == 'string') {
-                return myLEON.esc(val);
+                return _.esc(val);
             }
             if (typeof val == 'boolean') {
                 return (val) ? 'true' : 'false';
             }
             if (typeof val == 'number') {
-                return myLEON.esc(val.toString());
+                return _.esc(val.toString());
             }
             return '';
         },
@@ -96,7 +96,7 @@
          * @return a typeGuessed val
          */
         guessValueType: function(val) {
-            if (myLEON.typeGuessing === false || typeof val !== 'string') {
+            if (_.typeGuessing === false || typeof val !== 'string') {
                 return val;
             }
             if (val === '') {
@@ -130,9 +130,9 @@
             var expressions = undefined;
             var exprKey, exprVal,exprIndex = 0,levelDir = 1,underScore = -1;
             var i,level =0, j = 0;
-            myLEON.error = null;
+            _.error = null;
             if (typeof str !== 'string') {
-                myLEON.error = 'bad parameter.';
+                _.error = 'bad parameter.';
                 return undefined;
             }
             str += '.';
@@ -140,7 +140,7 @@
                 
                 if (str[i] === '-') {
                     if (i === str.length-1 || "0123456789~-_.".indexOf(str[i+1]) < 0) {
-                        myLEON.error = 'parse error: unexpected - at ' + i;
+                        _.error = 'parse error: unexpected - at ' + i;
                         return undefined;
                     }
                     i++;
@@ -148,7 +148,7 @@
                 }
                 if (str[i] === '_' && level === 0) {
                     if (underScore !== -1) {
-                        myLEON.error = 'parse error: unexpected _ at ' + i;
+                        _.error = 'parse error: unexpected _ at ' + i;
                         return undefined;
                     }
                     underScore = i;
@@ -176,14 +176,14 @@
                     level--;
                     levelDir = -1;
                     if (level < 0) {
-                        myLEON.error = 'parse error: unexpected ~ at ' + i;
+                        _.error = 'parse error: unexpected ~ at ' + i;
                         return undefined;
                     }
                     continue;
                 }
                 if (str[i] === '.' && level === 0) {
                     if (underScore >= j) {
-                        exprKey = myLEON.unEsc(str.slice(j, underScore));
+                        exprKey = _.unEsc(str.slice(j, underScore));
                         exprVal = str.slice(underScore + 1, i);
                         if (expressions === undefined) {
                             expressions = {};
@@ -199,18 +199,18 @@
                     exprIndex++;
                     underScore = -1;
                     if (exprVal[0] === '~') {
-                        expressions[exprKey] = myLEON.decode(exprVal.slice(1, exprVal.lastIndexOf('~')));
+                        expressions[exprKey] = _.decode(exprVal.slice(1, exprVal.lastIndexOf('~')));
                         if (expressions[exprKey] === 'undefined') {
                             LEON.error = 'Error in sub expression ' + exprVal + ':\n' + LEON.error;
                             return undefined;
                         }
                     } else {
-                        expressions[exprKey] = myLEON.guessValueType(myLEON.unEsc(exprVal));
+                        expressions[exprKey] = _.guessValueType(_.unEsc(exprVal));
                     }
                 }
             }
             if (level > 0) {
-                myLEON.error = 'parse error: missing ~';
+                _.error = 'parse error: missing ~';
                 return undefined;
             }
             
@@ -221,13 +221,11 @@
         }
     };
 
-    if (window.LEON === undefined) {
-        window.LEON = { 
-            encode: myLEON.encode, 
-            decode: myLEON.decode, 
-            error: function() { return myLEON.error }, 
-            typeGuessing: function(b) { myLEON.typeGuessing = b }
-        };
-    }    
+    return {
+        encode: _.encode, 
+        decode: _.decode, 
+        error: function() { return _.error }, 
+        typeGuessing: function(b) { _.typeGuessing = b }
+    };    
 
 }());
