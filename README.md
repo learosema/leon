@@ -1,7 +1,7 @@
 LEON.js
 =======
 
-LEON stands for **Lutz' Evil Object Notation** and can be used as an alternative to 
+LEON stands for **Lea's Evil Object Notation** and can be used as an alternative to 
 JSON. The sense behind LEON is to minimize URL-encoding in stringified JS objects 
 when you want to send them using ajax via HTTP-POST. 
 
@@ -66,7 +66,7 @@ String escaping is done using hyphens.
 
 LEON is released under the terms of the MIT license:
 
-Copyright (c) 2011 Lutz Rosema
+Copyright (c) 2018 Lea Rosema
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 software and associated documentation files (the "Software"), to deal in the Software
